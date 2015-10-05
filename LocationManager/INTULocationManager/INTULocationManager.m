@@ -503,7 +503,7 @@ static id _sharedInstance;
     CLLocation *mostRecentLocation = self.currentLocation;
     
     for (INTULocationRequest *locationRequest in self.locationRequests) {
-        if (locationRequest.hasTimedOut) {
+        if (locationRequest.isRecurring == NO && locationRequest.hasTimedOut) {
             // Request has timed out, complete it
             [self completeLocationRequest:locationRequest];
             continue;
@@ -709,7 +709,7 @@ static id _sharedInstance;
     INTULMLog(@"Location services error: %@", [error localizedDescription]);
     self.updateFailed = YES;
     
-    [self completeAllLocationRequests];
+    [self processLocationRequests];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
