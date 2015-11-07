@@ -104,6 +104,10 @@ typedef NS_ENUM(NSInteger, INTULocationAccuracy) {
     INTULocationAccuracyRoom,
 };
 
+/** An alias of the distance filter accuracy in meters.
+ Specifies the minimum amount of change in meters needed for a location service update. Observers will not be notified of updates less than the stated filter value. Default value is kCLDistanceFilterNone */
+typedef CLLocationDistance INTULocationFilterAccuracy;
+
 /** An alias of the heading filter accuracy in degrees.
     Specifies the minimum amount of change in degrees needed for a heading service update. Observers will not be notified of updates less than the stated filter value. */
 typedef CLLocationDegrees INTUHeadingFilterAccuracy;

@@ -298,6 +298,17 @@ static id _sharedInstance;
     }
 }
 
+/**
+ * Specifies the minimum amount of change in meters needed for a location service update. Observers will not be notified of updates less than the stated filter value.
+ */
+- (void)setDistanceFilter:(INTULocationFilterAccuracy)distanceFilter
+{
+    _distanceFilter = distanceFilter;
+
+    // Note: This updates the distance filter for all requests
+    self.locationManager.distanceFilter = distanceFilter;
+}
+
 #pragma mark Public heading methods
 
 /**
@@ -572,7 +583,7 @@ static id _sharedInstance;
     CLLocation *mostRecentLocation = self.currentLocation;
     
     for (INTULocationRequest *locationRequest in self.locationRequests) {
-        if (locationRequest.isRecurring == NO && locationRequest.hasTimedOut) {
+        if (locationRequest.hasTimedOut) {
             // Non-recurring request has timed out, complete it
             [self completeLocationRequest:locationRequest];
             continue;
@@ -882,7 +893,15 @@ static id _sharedInstance;
     INTULMLog(@"Location services error: %@", [error localizedDescription]);
     self.updateFailed = YES;
     
-    [self processLocationRequests];
+    for (INTULocationRequest *locationRequest in self.locationRequests) {
+        if (locationRequest.isRecurring) {
+            // Keep the recurring request alive
+            [self processRecurringRequest:locationRequest];
+        } else {
+            // Fail any non-recurring requests
+            [self completeLocationRequest:locationRequest];
+        }
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
